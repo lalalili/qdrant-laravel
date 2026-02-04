@@ -71,7 +71,7 @@ class QdrantTransport
                 data: $options
             );
 
-        return new Response( $response->json(), true);
+        return new Response( $response->json() );
     }
 
     public function get($uri): Response
@@ -80,7 +80,7 @@ class QdrantTransport
                 url:$this->baseUri . $uri
             );
 
-        return new Response( $response->json(), true );
+        return new Response( $response->json() );
     }
 
     public function put($uri, array $options = []): Response
@@ -98,7 +98,7 @@ class QdrantTransport
             );
         }
 
-        return new Response( $response->json(), true );
+        return new Response( $response->json() );
     }
 
     public function delete($uri, array $options = []): Response

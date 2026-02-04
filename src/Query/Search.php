@@ -123,7 +123,14 @@ class Search
             throw new SearchException('Search could not be performed. Not a valid response returned from server.');
         }
 
-        return PointsCollection::make($response->result() ?? []);
+        $result = $response->result() ?? [];
+
+        // query API 回傳 { points: [...] }；groupBy 模式回傳 { groups: [...] }
+        if (!$this->groupBy && isset($result['points'])) {
+            $result = $result['points'];
+        }
+
+        return PointsCollection::make($result);
     }
 
     public function get(): PointsCollection
