@@ -113,7 +113,7 @@ class QdrantTransport
                 url:$this->baseUri . $uri
             );
         }
-        return new Response( json_decode($response->json(), true) );
+        return new Response( $response->json() );
     }
 
     public function patch(string $uri, array $options = []): Response
@@ -123,7 +123,7 @@ class QdrantTransport
             data: $options
         );
 
-        return new Response( json_decode($response->json(), true) );
+        return new Response( $response->json() );
     }
 
     public function collection(?string $name = null): QdrantClient

@@ -37,7 +37,8 @@ class Schema
     public function create(string $name, Vector|array $vectors, array $options = [])
     {
         if ( $vectors instanceof Vector ) {
-            $this->validateVectorParameters($vectors->toArray());;
+            $vectors = $vectors->toArray();
+            $this->validateVectorParameters($vectors);
         } else if (isset($vectors['distance'])) {
             //we're in single vector mode
             $this->validateVectorParameters($vectors);
