@@ -3,6 +3,7 @@ namespace Mcpuishor\QdrantLaravel\Query;
 
 use Mcpuishor\QdrantLaravel\Enums\AverageVectorStrategy;
 use Mcpuishor\QdrantLaravel\Exceptions\SearchException;
+use Mcpuishor\QdrantLaravel\PointsCollection;
 use Mcpuishor\QdrantLaravel\Traits\HasFilters;
 
 class Recommend extends Search
@@ -32,7 +33,7 @@ class Recommend extends Search
         return $this;
     }
 
-    public function get(): array
+    public function get(): PointsCollection
     {
         if ($this->positives) {
             $this->query['positive'] = $this->positives;
