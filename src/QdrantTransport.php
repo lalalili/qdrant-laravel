@@ -2,6 +2,7 @@
 namespace Mcpuishor\QdrantLaravel;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Traits\Macroable;
 use InvalidArgumentException;
 use Mcpuishor\QdrantLaravel\DTOs\Response;
@@ -16,7 +17,7 @@ class QdrantTransport
     protected ?string $apiKey;
 
     private string $baseUri = '';
-    private $httpClient;
+    private PendingRequest $httpClient;
 
     public function __construct(
         private readonly ?string $connection = null,
@@ -64,26 +65,32 @@ class QdrantTransport
         return $this;
     }
 
-    public function post($uri, array $options = []): Response
+    /**
+     * @param  array<string, mixed>  $options
+     */
+    public function post(string $uri, array $options = []): Response
     {
         $response = $this->httpClient->post(
                 url:$this->baseUri . $uri,
                 data: $options
             );
 
-        return new Response( $response->json(), true);
+        return new Response( $response->json());
     }
 
-    public function get($uri): Response
+    public function get(string $uri): Response
     {
         $response = $this->httpClient->get(
                 url:$this->baseUri . $uri
             );
 
-        return new Response( $response->json(), true );
+        return new Response( $response->json() );
     }
 
-    public function put($uri, array $options = []): Response
+    /**
+     * @param  array<string, mixed>  $options
+     */
+    public function put(string $uri, array $options = []): Response
     {
         $response = $this->httpClient
             ->put(
@@ -98,10 +105,13 @@ class QdrantTransport
             );
         }
 
-        return new Response( $response->json(), true );
+        return new Response( $response->json() );
     }
 
-    public function delete($uri, array $options = []): Response
+    /**
+     * @param  array<string, mixed>  $options
+     */
+    public function delete(string $uri, array $options = []): Response
     {
         if ($options !== []) {
             $response = $this->httpClient->delete(
@@ -116,6 +126,9 @@ class QdrantTransport
         return new Response( $response->json() );
     }
 
+    /**
+     * @param  array<string, mixed>  $options
+     */
     public function patch(string $uri, array $options = []): Response
     {
         $response = $this->httpClient->patch(
@@ -134,7 +147,7 @@ class QdrantTransport
         );
     }
 
-    public function getBaseUri()
+    public function getBaseUri(): string
     {
         return $this->baseUri;
     }

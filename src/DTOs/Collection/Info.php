@@ -10,6 +10,7 @@ readonly class Info implements ConfigObject
         public int    $points_count,
         public int    $segments_count,
         public Config $config,
+        /** @var array<string, mixed> */
         public array  $payload_schema,
     ) {}
 
@@ -26,6 +27,9 @@ readonly class Info implements ConfigObject
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [
@@ -59,4 +63,3 @@ readonly class Info implements ConfigObject
         return $this->status === 'red';
     }
 }
-

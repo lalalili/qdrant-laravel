@@ -10,12 +10,12 @@ use Mcpuishor\QdrantLaravel\Traits\HasFilters;
 class Points
 {
     use HasFilters;
-    private $withPayload = true;
-    private $withVector = false;
+    private bool $withPayload = true;
+    private bool $withVector = false;
 
     public function __construct(
         private QdrantTransport $transport,
-        private readonly string $collection,
+        private readonly ?string $collection,
     ){
         $this->transport = $this->transport->baseUri("/collections/{$this->collection}/points" );
     }
@@ -44,6 +44,9 @@ class Points
         return $this;
     }
 
+    /**
+     * @param  array<int, int>  $ids
+     */
     public function get(array $ids): PointsCollection
     {
         if (empty($ids)) {
@@ -102,6 +105,9 @@ class Points
         return $response->isOk();
     }
 
+    /**
+     * @param  array<int, int>  $ids
+     */
     public function delete(array $ids): bool
     {
         $requestPayload = [
@@ -121,7 +127,7 @@ class Points
         return $response->isOk();
     }
 
-    public function autochunk(int $chunk_size = 1)
+    public function autochunk(int $chunk_size = 1): Autochunk
     {
         return new Autochunk($this, $chunk_size);
     }

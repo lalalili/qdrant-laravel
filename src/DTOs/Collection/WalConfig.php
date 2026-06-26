@@ -8,6 +8,9 @@ readonly class WalConfig
         public int $wal_segments_ahead,
     ) {}
 
+    /**
+     * @param  array<string, int>  $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(
@@ -16,6 +19,9 @@ readonly class WalConfig
         );
     }
 
+    /**
+     * @return array<string, int>
+     */
     public function toArray(): array
     {
         return [

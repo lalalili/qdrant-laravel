@@ -8,7 +8,7 @@ class Info
 
     public function __construct(
         protected QdrantTransport $transport,
-        private string $collection
+        private ?string $collection
     ){
         $this->transport = $this->transport->baseUri("/collections");
     }

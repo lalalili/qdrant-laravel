@@ -16,6 +16,9 @@ readonly class Vector
         public ?VectorDatatype $datatype = null,
     ){}
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         $values = collect([
@@ -29,8 +32,11 @@ readonly class Vector
 
         return $values->filter()->toArray();
     }
-    static function fromArray($options): self
+    /**
+     * @param  array<string, mixed>  $options
+     */
+    static function fromArray(array $options): self
     {
-        return new static(...$options);
+        return new self(...$options);
     }
 }

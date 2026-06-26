@@ -434,3 +434,31 @@ it('can use a different vector than the default one', function(){
     expect($result)->toBeInstanceOf(PointsCollection::class)
         ->toHaveCount(3);
 });
+
+it('can return random points with payload and vectors', function () {
+    $field = 'test_field';
+
+    $this->transport->shouldReceive('post')
+        ->withArgs([
+            "",
+            [
+                "collection_name" => $this->testCollectionName,
+                "sample" => "random",
+                "limit" => 3,
+                "with_payload" => [
+                    "only" => [$field],
+                ],
+                "with_vectors" => true,
+            ]
+        ])
+        ->andReturn($this->validResponse);
+
+    $result = $this->query
+        ->search()
+        ->withPayload(include: [$field])
+        ->withVectors()
+        ->random(3);
+
+    expect($result)->toBeArray()
+        ->toHaveCount(3);
+});

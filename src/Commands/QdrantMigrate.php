@@ -17,21 +17,25 @@ class QdrantMigrate extends Command
 
     protected $description = 'Run Qdrant schema migrations, including index management.';
 
-    public function handle()
+    public function handle(): int
     {
-        $collectionName = $this->option('collection') ?? config('qdrant-laravel.default_collection');
-        $vectorSize = $this->option('vector-size') ?? config('qdrant-laravel.default_vector_size');
-        $distanceMetric = $this->option('distance-metric') ?? config('qdrant-laravel.default_distance_metric');
-        $indexes = $this->option('indexes') ? json_decode($this->option('indexes'), true) : config('qdrant-laravel.default_indexes');
+        $collectionName = (string) ($this->option('collection') ?? config('qdrant-laravel.default_collection'));
+        $vectorSize = (int) ($this->option('vector-size') ?? config('qdrant-laravel.default_vector_size'));
+        $distanceMetric = (string) ($this->option('distance-metric') ?? config('qdrant-laravel.default_distance_metric'));
+        $indexesOption = $this->option('indexes');
+        $indexes = is_string($indexesOption)
+            ? json_decode($indexesOption, true)
+            : config('qdrant-laravel.default_indexes', []);
+        $indexes = is_array($indexes) ? $indexes : [];
 
         if (!DistanceMetric::validate($distanceMetric)) {
             $this->error("Invalid distance metric: {$distanceMetric}. Allowed: " . implode(', ', DistanceMetric::values()));
-            return;
+            return self::SUCCESS;
         }
 
         if ($this->option('rollback')) {
             $this->rollback($collectionName, $indexes);
-            return;
+            return self::SUCCESS;
         }
 
         $this->info("Creating collection: {$collectionName}");
@@ -56,9 +60,14 @@ class QdrantMigrate extends Command
         }
 
         $this->info("Qdrant migration completed for collection: {$collectionName}");
+
+        return self::SUCCESS;
     }
 
-    protected function rollback(string $collectionName, array $indexes)
+    /**
+     * @param  array<string, string>  $indexes
+     */
+    protected function rollback(string $collectionName, array $indexes): void
     {
         $this->info("Rolling back migration for collection: {$collectionName}");
 

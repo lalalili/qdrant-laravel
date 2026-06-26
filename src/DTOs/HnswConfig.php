@@ -14,6 +14,9 @@ readonly class HnswConfig implements ConfigObject
         public ?int $payload_m = null,
     ) {}
 
+    /**
+     * @param  array<string, mixed>  $data
+     */
     public static function fromArray(array $data): self
     {
         return new self(
@@ -26,6 +29,9 @@ readonly class HnswConfig implements ConfigObject
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [

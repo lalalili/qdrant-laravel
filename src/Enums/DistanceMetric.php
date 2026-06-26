@@ -8,6 +8,9 @@ enum DistanceMetric: string
     case DOT = 'Dot';
     case MANHATTAN = 'Manhattan';
 
+    /**
+     * @return array<int, string>
+     */
     public static function values(): array
     {
         return array_column(DistanceMetric::cases(), 'value');

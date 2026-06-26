@@ -22,9 +22,9 @@ class Schema
         $this->transport = $this->transport->baseUri("/collections");
     }
 
-    static public function connection(?string $connection = null): self
+    public static function connection(?string $connection = null): self
     {
-        return new static(
+        return new self(
             $connection !== null
                 ? new QdrantTransport($connection)
                 : app(QdrantTransport::class)
@@ -34,7 +34,11 @@ class Schema
     /**
      * @throws FailedToCreateCollectionException
      */
-    public function create(string $name, Vector|array $vectors, array $options = [])
+    /**
+     * @param  array<string, mixed>|Vector  $vectors
+     * @param  array<int|string, mixed>  $options
+     */
+    public function create(string $name, Vector|array $vectors, array $options = []): mixed
     {
         if ( $vectors instanceof Vector ) {
             $vectors = $vectors->toArray();
@@ -54,13 +58,16 @@ class Schema
         }
 
         if(!empty($options)) {
-            collect($options)->flatMap(function($value, $key) {
+            $options = collect($options)->flatMap(function($value, $key) {
                 if ($value instanceof ConfigObject) {
-                    return [ $key => $value->toArray() ];
+                    $class = explode('\\', get_class($value));
+                    $name = str()->snake(end($class));
+
+                    return [ $name => $value->toArray() ];
                 }
 
                 return [$key => $value];
-            });
+            })->toArray();
         }
 
         try {
@@ -84,11 +91,16 @@ class Schema
         return  $response->result();
     }
 
+    /**
+     * @return Collection<int, string>
+     */
     public function collections(): Collection
     {
         $response = $this->transport->get( '' );
 
-        return collect($response->result()['collections'] ?? [])->pluck('name');
+        $collections = $response->result()['collections'] ?? [];
+
+        return collect(is_array($collections) ? $collections : [])->pluck('name');
     }
 
     public function exists(?string $name= null): bool
@@ -100,6 +112,10 @@ class Schema
         return $response->result()['exists'] ?? throw new InvalidArgumentException("Error in response from Qdrant server.");
     }
 
+    /**
+     * @param  array<string, mixed>  $vectors
+     * @param  array<int|string, mixed>  $options
+     */
     public function update(?string $collectionName=null, array $vectors = [], array $options = []): bool
     {
         if (empty($vectors) && empty($options)) {
@@ -116,7 +132,7 @@ class Schema
         $options = collect($options)
             ->flatMap(function($configObject){
                 if (!$configObject instanceof ConfigObject) {
-                    return;
+                    return [];
                 }
                 $class = explode('\\', get_class($configObject));
                 $name = str()->snake(end($class));
@@ -145,6 +161,9 @@ class Schema
         return $response->result();
     }
 
+    /**
+     * @param  array<string, mixed>  $vector
+     */
     private function validateVectorParameters(array $vector): bool
     {
         if (isset($vector['distance']) && !DistanceMetric::validate($vector['distance'])) {

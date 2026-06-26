@@ -12,6 +12,9 @@ enum FieldType: string
     case DATETIME = 'datetime';
     case UUID = 'uuid';
 
+    /**
+     * @return array<int, string>
+     */
     public static function values(): array
     {
         return array_column(FieldType::cases(), 'value');

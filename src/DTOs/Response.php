@@ -6,6 +6,7 @@ use Mcpuishor\QdrantLaravel\Enums\ServerResponseStatus;
 readonly class Response
 {
     public function __construct(
+        /** @var array<string, mixed> */
         public readonly array $serverResponse,
     ){}
 
@@ -25,7 +26,7 @@ readonly class Response
         return $this->serverResponse['usage'];
     }
 
-    public function result()
+    public function result(): mixed
     {
         return $this->serverResponse['result'];
     }

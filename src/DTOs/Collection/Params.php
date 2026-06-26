@@ -3,6 +3,7 @@ namespace Mcpuishor\QdrantLaravel\DTOs\Collection;
 readonly class Params implements ConfigObject
 {
     public function __construct(
+        /** @var array<string, mixed> */
         public array $vectors,
         public int   $shard_number,
         public int   $replication_factor,
@@ -21,6 +22,9 @@ readonly class Params implements ConfigObject
         );
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function toArray(): array
     {
         return [

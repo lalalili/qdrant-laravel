@@ -3,11 +3,12 @@ namespace Mcpuishor\QdrantLaravel\Traits;
 
 use Mcpuishor\QdrantLaravel\Enums\FilterConditions;
 use Mcpuishor\QdrantLaravel\Enums\FilterVerbs;
-use Mcpuishor\QdrantLaravel\QdrantClient;
 
 trait HasFilters
 {
+    /** @var array<string, mixed> */
     public array $filters = [];
+
     public function must(string $key, ?FilterConditions $condition = null, mixed $value =  null): self
     {
         return  $this->addFilter(FilterVerbs::MUST, $key, $condition, $value);
@@ -31,8 +32,10 @@ trait HasFilters
         return $this;
     }
 
-    private function addFilter(FilterVerbs $verb, string $key, FilterConditions $condition, mixed $value = null): self
+    private function addFilter(FilterVerbs $verb, string $key, ?FilterConditions $condition, mixed $value = null): self
     {
+        $condition ??= FilterConditions::MATCH;
+
         $this->filters[$verb->value][] = [
             'key' => $key,
             $condition->value => [
@@ -48,6 +51,9 @@ trait HasFilters
         return count($this->filters) > 0;
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getFilters(): array
     {
         return $this->filters;

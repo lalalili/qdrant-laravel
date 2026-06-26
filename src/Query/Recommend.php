@@ -10,17 +10,24 @@ class Recommend extends Search
 {
     use HasFilters;
 
+    /** @var array<int, int|string> */
     private array $positives = [];
+    /** @var array<int, int|string> */
     private array $negatives = [];
     private ?AverageVectorStrategy $strategy = null;
-    private ?string $using = null;
 
+    /**
+     * @param  array<int, int|string>|int|string  $ids
+     */
     public function positive(array|string|int $ids): self
     {
         $this->positives = array_merge($this->positives, (array)$ids);
         return $this;
     }
 
+    /**
+     * @param  array<int, int|string>|int|string  $ids
+     */
     public function negative(array|string|int $ids): self
     {
         $this->negatives = array_merge($this->negatives, (array)$ids);
@@ -35,23 +42,21 @@ class Recommend extends Search
 
     public function get(): PointsCollection
     {
+        $query = is_array($this->query) ? $this->query : [];
+
         if ($this->positives) {
-            $this->query['positive'] = $this->positives;
+            $query['positive'] = $this->positives;
         }
 
         if ($this->negatives) {
-            $this->query['negative'] = $this->negatives;
+            $query['negative'] = $this->negatives;
         }
 
-        $this->query['strategy'] = $this->strategy->value ?? AverageVectorStrategy::default()->value;
+        $query['strategy'] = $this->strategy->value ?? AverageVectorStrategy::default()->value;
 
         $this->query = [
-            'recommend' => $this->query,
+            'recommend' => $query,
         ];
-
-        if ($this->getFilters()) {
-            $searchPayload['filter'] = $this->getFilters();
-        }
 
         return parent::get();
     }

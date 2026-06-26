@@ -13,7 +13,7 @@ class Autochunk {
         $this->collection = new PointsCollection();
     }
 
-    public function add(Point $point)
+    public function add(Point $point): void
     {
         if ($this->collection->count() >= $this->chunk_size) {
             $this->flush();

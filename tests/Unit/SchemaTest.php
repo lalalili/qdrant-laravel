@@ -176,6 +176,43 @@ describe('Collections', function() {
         expect($response)->toBeTrue();
     });
 
+    it('can create a new collection with config object options', function () {
+        $testCollectionName = 'testcollection';
+        $optimizersConfig = OptimizersConfig::fromArray([
+            'flush_interval_sec' => 2,
+        ]);
+
+        $this->transport->shouldReceive('put')
+            ->withArgs([
+                '/' . $testCollectionName,
+                [
+                    "vectors" => [
+                        'size' => 1000,
+                        'distance' => DistanceMetric::COSINE->value,
+                    ],
+                    'optimizers_config' => [
+                        'flush_interval_sec' => 2,
+                    ],
+                ]
+            ])
+            ->andReturn(
+                new Response([
+                    'time' => 1,
+                    'status' => 'ok',
+                    'result' => true,
+                ])
+            );
+
+        $response = $this->qdrantSchema
+            ->create(
+                $testCollectionName,
+                ['size' => 1000, 'distance' => DistanceMetric::COSINE->value],
+                [$optimizersConfig],
+            );
+
+        expect($response)->toBeTrue();
+    });
+
     it('can update the parameters of a collection', function(){
         $collectionName = "test";
         $optionsUpdate = [

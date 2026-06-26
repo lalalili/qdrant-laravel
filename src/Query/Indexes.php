@@ -6,12 +6,12 @@ use Mcpuishor\QdrantLaravel\QdrantTransport;
 
 class Indexes
 {
-    private $on_disk = false;
-    private $parameterized = false;
+    private bool $on_disk = false;
+    private bool $parameterized = false;
 
     public function __construct(
         private QdrantTransport $transport,
-        private  string          $collection,
+        private ?string          $collection,
     ){
         $this->transport = $this->transport->baseUri("/collections/{$this->collection}/index");
     }

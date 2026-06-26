@@ -32,7 +32,7 @@ class QdrantClient
         return $this;
     }
 
-    public function info()
+    public function info(): Info
     {
         return new Info($this->transport, $this->collection);
     }
@@ -62,12 +62,12 @@ class QdrantClient
         return new Vectors($this->transport, $this->collection);
     }
 
-    public function payloads()
+    public function payloads(): Payloads
     {
         return new Payloads($this->transport, $this->collection);
     }
 
-    public function search(int $hnsw_ef = 128, bool $exact = false, int $limit = 10)
+    public function search(int $hnsw_ef = 128, bool $exact = false, int $limit = 10): Search
     {
         return new Search($this->transport, $this->collection, $hnsw_ef, $exact, $limit);
     }

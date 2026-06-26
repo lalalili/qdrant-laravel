@@ -10,19 +10,23 @@ class Search
 {
     use HasFilters;
     private bool $withPayload = false;
+    /** @var array<int, string> */
     private array $include = [];
+    /** @var array<int, string> */
     private array $exclude = [];
     private bool $withVectors = false;
-    protected string|array $query;
+    /** @var array<int|string, mixed>|int|string */
+    protected string|int|array $query;
 
     private int $offset = 0;
+    /** @var array<string, mixed> */
     private array $groupBy = [];
 
     private ?string $using = null;
 
     public function __construct(
         protected QdrantTransport $transport,
-        protected string $collection,
+        protected ?string $collection,
         protected int $hnsw_ef,
         protected bool $exact,
         protected int $limit,
@@ -30,6 +34,10 @@ class Search
         $this->transport = $this->transport->baseUri("/collections/{$this->collection}/points/query");
     }
 
+    /**
+     * @param  array<int, string>|null  $include
+     * @param  array<int, string>|null  $exclude
+     */
     public function withPayload( ?array $include = null, ?array $exclude = null): self
     {
         if (!empty($include)) {
@@ -63,7 +71,7 @@ class Search
         return $this;
     }
 
-    public function offset($startOffset = 0): self
+    public function offset(int $startOffset = 0): self
     {
         $this->offset = $startOffset;
 
@@ -76,6 +84,9 @@ class Search
         return $this;
     }
 
+    /**
+     * @param  array<int, float|int>  $vector
+     */
     public function vector(array $vector): self
     {
         if (empty($vector)) {
@@ -98,6 +109,9 @@ class Search
        return $this;
     }
 
+    /**
+     * @param  array<string, mixed>  $withLookup
+     */
     public function groupBy(string $payloadKey, int $groupSize = 100, array $withLookup = []): self
     {
         $this->groupBy = [
@@ -112,6 +126,9 @@ class Search
         return $this;
     }
 
+    /**
+     * @param  array<string, mixed>  $query
+     */
     public function raw(array $query): PointsCollection
     {
         $response = $this->transport->post(
@@ -131,6 +148,9 @@ class Search
         return $this->raw($this->getSearchPayload());
     }
 
+    /**
+     * @return array<string, mixed>
+     */
     public function getSearchPayload(): array
     {
         $searchPayload = [
@@ -181,13 +201,20 @@ class Search
         return $searchPayload;
     }
 
-    public function add(array|string $query): self
+    /**
+     * @param  array<int|string, mixed>|int|string  $query
+     */
+    public function add(array|int|string $query): self
     {
         $this->query = $query;
 
         return $this;
     }
 
+    /**
+     * @param  array<int, mixed>  $searches
+     * @return array<string, mixed>
+     */
     public function batch(array $searches): array
     {
         throw_if(count($searches) === 0, SearchException::class, 'Search array cannot be empty.');
@@ -207,6 +234,9 @@ class Search
         )->result();
     }
 
+    /**
+     * @return array<int|string, mixed>
+     */
     public function random(?int $limit): array
     {
         $payload = [
@@ -219,23 +249,23 @@ class Search
         }
 
         if ($this->withPayload) {
-            $searchPayload['with_payload'] = true;
+            $payload['with_payload'] = true;
         }
 
         if ($this->withPayload && $this->include) {
-            $searchPayload['with_payload'] = [
-                'only' => $this->only,
+            $payload['with_payload'] = [
+                'only' => $this->include,
             ];
         }
 
         if ($this->withPayload && $this->exclude) {
-            $searchPayload['with_payload'] = [
+            $payload['with_payload'] = [
                 'exclude' => $this->exclude,
             ];
         }
 
         if($this->withVectors) {
-            $searchPayload['with_vectors'] = true;
+            $payload['with_vectors'] = true;
         }
 
         return $this->transport->post(

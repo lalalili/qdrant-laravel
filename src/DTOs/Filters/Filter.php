@@ -6,6 +6,7 @@ use Mcpuishor\QdrantLaravel\Exceptions\InvalidFilterException;
 
 abstract class Filter
 {
+    /** @var array<string, mixed> */
     private array $conditions = [];
 
 //    public function __construct(
@@ -13,6 +14,9 @@ abstract class Filter
 //        private readonly array $values,
 //    ){}
 
+    /**
+     * @return array<string, mixed>
+     */
     public function get(): array
     {
         if (!$this->validate()) {
@@ -22,7 +26,7 @@ abstract class Filter
         return $this->conditions;
     }
 
-    protected function add(FilterConditions $condition, mixed $value = null)
+    protected function add(FilterConditions $condition, mixed $value = null): void
     {
         $this->conditions[$condition->value] = $value;
     }

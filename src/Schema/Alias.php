@@ -7,6 +7,7 @@ use Mcpuishor\QdrantLaravel\QdrantTransport;
 
 class Alias
 {
+    /** @var array<int, array<string, array<string, string>>> */
     private array $actions = [];
 
     public function __construct(
@@ -62,12 +63,17 @@ class Alias
         return $response->result();
     }
 
+    /**
+     * @return Collection<int, array<string, mixed>>
+     */
     public function get(): Collection
     {
         $response = $this->transport
             ->baseUri($this->collectionName ? "/collections/{$this->collectionName}" : "")
             ->get("/aliases");
 
-        return collect($response->result()["aliases"] ?? []);
+        $aliases = $response->result()["aliases"] ?? [];
+
+        return collect(is_array($aliases) ? $aliases : []);
     }
 }

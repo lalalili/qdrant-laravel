@@ -10,7 +10,7 @@ class Vectors
     use HasFilters;
     public function __construct(
         private QdrantTransport $transport,
-        private string          $collection,
+        private ?string         $collection,
     ){
         $this->transport = $this->transport->baseUri("/collections/{$this->collection}/points/vectors");
     }
@@ -25,6 +25,9 @@ class Vectors
         )->isOk();
     }
 
+    /**
+     * @param  array<int, int>  $ids
+     */
     public function delete(array $ids): bool
     {
         return $this->transport->post(
